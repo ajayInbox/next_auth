@@ -3,7 +3,8 @@
  * @type {string[]}
  */
 export const publicRoutes: string[] = [
-    "/"
+    "/",
+    "/auth/new-verification",
 ]
 
 /**
@@ -13,6 +14,8 @@ export const publicRoutes: string[] = [
 export const protectedRoutes: string[] = [
     "/auth/login",
     "/auth/register",
+    "/auth/error",
+    "/auth/reset",
 ]
 
 /**

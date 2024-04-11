@@ -16,7 +16,7 @@ import {
 import CardWrapper from './card-wrapper'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
-import FormErrors from '../form-errors'
+import FormErrors from './form-errors'
 import FormSuccess from './form-success'
 import { register } from '@/actions/register'
 
