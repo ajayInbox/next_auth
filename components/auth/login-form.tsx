@@ -26,9 +26,10 @@ export default function LoginForm() {
 
     const params = useSearchParams()
     const urlError = params.get("error")==="OAuthAccountNotLinked" ? "Email already in use With Different Providers":""
+    const[showTwoFactor, setShowTwoFactor] = useState(true)
     const[error, setError] = useState<string | undefined>("")
     const[success, setSuccess] = useState<string | undefined>("")
-    const [isPending, startTransition] = useTransition()
+    const[isPending, startTransition] = useTransition()
 
     const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
@@ -44,8 +45,20 @@ export default function LoginForm() {
         startTransition(() => {
             login(values)
             .then((data) => {
-                setError(data?.error)
-                setSuccess(data?.success)
+                if(data?.error){
+                    form.reset()
+                    setError(data?.error)
+                }
+                if(data?.success){
+                    form.reset()
+                    setSuccess(data?.success)
+                }
+                if(data?.twoFactor){
+                    setShowTwoFactor(true)
+                }
+            })
+            .catch(() => {
+                setError("Something went wrong!")
             })
         })
     }
@@ -61,10 +74,12 @@ export default function LoginForm() {
                 className='space-y-4'
                 onSubmit={form.handleSubmit(onSubmit)}>
                     <div className='space-y-6'>
-                        <FormField
-                            control={form.control}
-                            name='email'
-                            render={({field}) => (
+                        {!showTwoFactor && (
+                            <>
+                            <FormField
+                                control={form.control}
+                                name='email'
+                                render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
                                     <FormControl>
@@ -73,10 +88,10 @@ export default function LoginForm() {
                                     <FormMessage/>
                                 </FormItem>
                             )}/>
-                        <FormField
-                            control={form.control}
-                            name='password'
-                            render={({field}) => (
+                            <FormField
+                                control={form.control}
+                                name='password'
+                                render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Password</FormLabel>
                                     <FormControl>
@@ -94,11 +109,28 @@ export default function LoginForm() {
                                     <FormMessage/>
                                 </FormItem>
                             )}/>
+                            </>
+                        )}
+                        {
+                            showTwoFactor && (
+                                <FormField
+                                    control={form.control}
+                                    name='email'
+                                    render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>2FA Code</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} placeholder='123456' type='text'/>
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}/>    
+                        )}
                     </div>
                     <FormErrors message={error || urlError}/>
                     <FormSuccess message={success}/>
                     <Button className='w-full' type='submit' disabled={isPending}>
-                        Login
+                        { showTwoFactor ? "Confirm" : "Login"}
                     </Button>
             </form>
         </Form>

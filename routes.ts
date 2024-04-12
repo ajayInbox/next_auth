@@ -16,6 +16,7 @@ export const protectedRoutes: string[] = [
     "/auth/register",
     "/auth/error",
     "/auth/reset",
+    "/auth/new-password",
 ]
 
 /**
